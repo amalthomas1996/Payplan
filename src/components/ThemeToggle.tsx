@@ -18,8 +18,15 @@ export default function ThemeToggle() {
       <IconButton
         onClick={toggleColorMode}
         aria-label={label}
-        size="large"
-        sx={{ border: 1, borderColor: "divider", borderRadius: 2 }}
+        sx={{
+          border: 1,
+          borderColor: "divider",
+          borderRadius: 2,
+          p: { xs: 0.5, sm: 1 },
+          "& svg": {
+            fontSize: { xs: "1.2rem", sm: "1.5rem", md: "1.8rem" },
+          },
+        }}
       >
         {isLight ? <DarkModeIcon /> : <LightModeIcon />}
       </IconButton>

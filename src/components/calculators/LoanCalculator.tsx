@@ -15,12 +15,10 @@ import {
   ToggleButtonGroup,
   Tooltip,
   IconButton,
-  CardActions,
   InputAdornment,
 } from "@mui/material";
-// ✅ Use Grid v2
+// ✅ Grid v2 import (stable in MUI v6+)
 import Grid from "@mui/material/Grid2";
-
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import { fmt } from "@/lib/number";
 
@@ -56,7 +54,7 @@ export default function LoanCalculator() {
   }, [principal, rate, tenure, tenureType]);
 
   return (
-    <Card elevation={2}>
+    <Card elevation={2} sx={{ width: "100%" }}>
       <CardHeader
         title="EMI Calculator"
         subheader="Compute monthly EMI, total interest, and total payable"
@@ -87,6 +85,7 @@ export default function LoanCalculator() {
                   ),
                 }}
               />
+
               <TextField
                 label="Interest Rate (% p.a.)"
                 type="number"
@@ -125,7 +124,12 @@ export default function LoanCalculator() {
                 fullWidth
               />
 
-              <Button onClick={onCalculate} size="large" variant="contained">
+              <Button
+                onClick={onCalculate}
+                size="large"
+                variant="contained"
+                fullWidth
+              >
                 Calculate
               </Button>
             </Stack>
@@ -164,7 +168,6 @@ export default function LoanCalculator() {
   );
 }
 
-/** A tile that matches the screenshot: outlined, equal height, comfy spacing */
 function StatCard({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <Card variant="outlined" sx={{ height: "100%", borderRadius: 2 }}>
