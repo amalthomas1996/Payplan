@@ -23,12 +23,20 @@ import {
   TableRow,
   TableContainer,
   Paper,
+  useMediaQuery,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  Chip,
 } from "@mui/material";
-// ✅ Grid v2 import (MUI v6+)
 import Grid from "@mui/material/Grid2";
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { fmt } from "@/lib/number";
-import { calcEMI, compareWithBaseline, round2 } from "@/lib/emi";
+import { compareWithBaseline, round2 } from "@/lib/emi";
+import { useTheme } from "@mui/material/styles";
+
+/* ---------------------------------------------------- */
 
 export default function LoanCalculator() {
   // Core inputs
@@ -47,13 +55,15 @@ export default function LoanCalculator() {
   const months = tenureType === "years" ? tenure * 12 : tenure;
 
   // Compute everything reactively
-  const run = React.useMemo(() => {
-    return compareWithBaseline(principal, rate, months, {
-      extraMonthly,
-      lumpSum,
-      lumpSumMonth,
-    });
-  }, [principal, rate, months, extraMonthly, lumpSum, lumpSumMonth]);
+  const run = React.useMemo(
+    () =>
+      compareWithBaseline(principal, rate, months, {
+        extraMonthly,
+        lumpSum,
+        lumpSumMonth,
+      }),
+    [principal, rate, months, extraMonthly, lumpSum, lumpSumMonth]
+  );
 
   const result = run.withPrepay;
 
@@ -69,6 +79,10 @@ export default function LoanCalculator() {
   const effectiveMonths = result.monthsPaid;
   const years = Math.floor(effectiveMonths / 12);
   const remMonths = effectiveMonths % 12;
+
+  // responsive
+  const theme = useTheme();
+  const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
 
   return (
     <Card elevation={2} sx={{ width: "100%" }}>
@@ -232,12 +246,10 @@ export default function LoanCalculator() {
             </Grid>
           </Grid>
 
-          {/* ✅ FULL-WIDTH CALCULATE BUTTON */}
+          {/* FULL-WIDTH CALCULATE BUTTON */}
           <Grid size={{ xs: 12 }}>
             <Button
-              onClick={() => {
-                /* values compute reactively; keep for UX parity */
-              }}
+              onClick={() => {}}
               size="large"
               variant="contained"
               fullWidth
@@ -247,66 +259,79 @@ export default function LoanCalculator() {
             </Button>
           </Grid>
 
-          {/* ✅ FULL-WIDTH SCHEDULE BELOW */}
+          {/* FULL-WIDTH SCHEDULE */}
           <Grid size={{ xs: 12 }}>
             <Box sx={{ mt: 3 }}>
-              <Typography variant="h6" sx={{ mb: 1.5 }}>
-                Repayment Schedule
-              </Typography>
+              <Box
+                sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1.5 }}
+              >
+                <Typography variant="h6">Repayment Schedule</Typography>
+                {isSmall && (
+                  <Chip
+                    size="small"
+                    label="Tap rows to expand"
+                    sx={{ borderRadius: 1.5 }}
+                  />
+                )}
+              </Box>
 
-              <TableContainer component={Paper} sx={{ maxHeight: 420 }}>
-                <Table
-                  stickyHeader
-                  size="small"
-                  aria-label="repayment schedule"
-                >
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Month</TableCell>
-                      <TableCell align="right">EMI</TableCell>
-                      <TableCell align="right">Extra</TableCell>
-                      <TableCell align="right">Lump Sum</TableCell>
-                      <TableCell align="right">Interest</TableCell>
-                      <TableCell align="right">Principal</TableCell>
-                      <TableCell align="right">Balance</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {result.schedule.map((row) => (
-                      <TableRow key={row.month}>
-                        <TableCell>{row.month}</TableCell>
-                        <TableCell align="right">₹ {fmt(row.emi)}</TableCell>
-                        <TableCell align="right">
-                          ₹ {fmt(row.extraMonthly)}
-                        </TableCell>
-                        <TableCell align="right">
-                          ₹ {fmt(row.lumpSum)}
-                        </TableCell>
-                        <TableCell align="right">
-                          ₹ {fmt(row.interestPaid)}
-                        </TableCell>
-                        <TableCell align="right">
-                          ₹ {fmt(row.principalPaid)}
-                        </TableCell>
-                        <TableCell align="right">
-                          ₹ {fmt(row.balance)}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {result.schedule.length === 0 && (
+              {isSmall ? (
+                <MobileScheduleAccordion rows={result.schedule} />
+              ) : (
+                <TableContainer component={Paper} sx={{ maxHeight: 480 }}>
+                  <Table
+                    stickyHeader
+                    size="small"
+                    aria-label="repayment schedule"
+                  >
+                    <TableHead>
                       <TableRow>
-                        <TableCell
-                          colSpan={7}
-                          align="center"
-                          sx={{ py: 4, color: "text.secondary" }}
-                        >
-                          No schedule to show. Check your inputs.
-                        </TableCell>
+                        <TableCell>Month</TableCell>
+                        <TableCell align="right">EMI</TableCell>
+                        <TableCell align="right">Extra</TableCell>
+                        <TableCell align="right">Lump Sum</TableCell>
+                        <TableCell align="right">Interest</TableCell>
+                        <TableCell align="right">Principal</TableCell>
+                        <TableCell align="right">Balance</TableCell>
                       </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
+                    </TableHead>
+                    <TableBody>
+                      {result.schedule.map((row) => (
+                        <TableRow key={row.month}>
+                          <TableCell>{row.month}</TableCell>
+                          <TableCell align="right">₹ {fmt(row.emi)}</TableCell>
+                          <TableCell align="right">
+                            ₹ {fmt(row.extraMonthly)}
+                          </TableCell>
+                          <TableCell align="right">
+                            ₹ {fmt(row.lumpSum)}
+                          </TableCell>
+                          <TableCell align="right">
+                            ₹ {fmt(row.interestPaid)}
+                          </TableCell>
+                          <TableCell align="right">
+                            ₹ {fmt(row.principalPaid)}
+                          </TableCell>
+                          <TableCell align="right">
+                            ₹ {fmt(row.balance)}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                      {result.schedule.length === 0 && (
+                        <TableRow>
+                          <TableCell
+                            colSpan={7}
+                            align="center"
+                            sx={{ py: 4, color: "text.secondary" }}
+                          >
+                            No schedule to show. Check your inputs.
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+              )}
             </Box>
           </Grid>
         </Grid>
@@ -314,6 +339,8 @@ export default function LoanCalculator() {
     </Card>
   );
 }
+
+/* ----------------- Small components ----------------- */
 
 function StatCard({ label, value }: { label: string; value: React.ReactNode }) {
   return (
@@ -354,7 +381,6 @@ function CompareCard(props: {
     paymentSaved,
     monthsSaved,
   } = props;
-
   return (
     <Card variant="outlined" sx={{ borderRadius: 2 }}>
       <CardContent>
@@ -394,5 +420,99 @@ function CompareCard(props: {
         </Box>
       </CardContent>
     </Card>
+  );
+}
+
+/* --------- Mobile accordion for schedule (xs/sm) --------- */
+
+function MobileScheduleAccordion({
+  rows,
+}: {
+  rows: Array<{
+    month: number;
+    emi: number;
+    extraMonthly: number;
+    lumpSum: number;
+    interestPaid: number;
+    principalPaid: number;
+    balance: number;
+  }>;
+}) {
+  const [expanded, setExpanded] = React.useState<number | false>(
+    rows.length ? rows[0].month : false
+  );
+
+  return (
+    <Box>
+      {rows.length === 0 && (
+        <Card variant="outlined">
+          <CardContent sx={{ textAlign: "center", color: "text.secondary" }}>
+            No schedule to show. Check your inputs.
+          </CardContent>
+        </Card>
+      )}
+
+      {rows.map((r) => {
+        const panel = r.month;
+        return (
+          <Accordion
+            key={r.month}
+            expanded={expanded === panel}
+            onChange={(_, isExp) => setExpanded(isExp ? panel : false)}
+            disableGutters
+            sx={{
+              "&::before": { display: "none" },
+              borderRadius: 2,
+              mb: 1,
+              overflow: "hidden",
+              border: 1,
+              borderColor: "divider",
+            }}
+          >
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls={`panel-${r.month}-content`}
+              id={`panel-${r.month}-header`}
+            >
+              <Box
+                sx={{
+                  width: "100%",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: 1,
+                }}
+              >
+                <Typography variant="subtitle2">Month {r.month}</Typography>
+                <Typography variant="subtitle2">
+                  Balance: ₹ {fmt(r.balance)}
+                </Typography>
+              </Box>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Grid container spacing={1.25}>
+                <KV label="EMI" value={`₹ ${fmt(r.emi)}`} />
+                <KV label="Interest" value={`₹ ${fmt(r.interestPaid)}`} />
+                <KV label="Principal" value={`₹ ${fmt(r.principalPaid)}`} />
+                <KV label="Extra" value={`₹ ${fmt(r.extraMonthly)}`} />
+                <KV label="Lump Sum" value={`₹ ${fmt(r.lumpSum)}`} />
+              </Grid>
+            </AccordionDetails>
+          </Accordion>
+        );
+      })}
+    </Box>
+  );
+}
+
+function KV({ label, value }: { label: string; value: React.ReactNode }) {
+  return (
+    <Grid size={{ xs: 6 }}>
+      <Box sx={{ display: "flex", flexDirection: "column", gap: 0.25 }}>
+        <Typography variant="caption" color="text.secondary">
+          {label}
+        </Typography>
+        <Typography variant="body2">{value}</Typography>
+      </Box>
+    </Grid>
   );
 }
