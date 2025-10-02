@@ -15,10 +15,12 @@ import {
   ToggleButtonGroup,
   Tooltip,
   IconButton,
-  Grid,
   CardActions,
   InputAdornment,
 } from "@mui/material";
+// ✅ Use Grid v2
+import Grid from "@mui/material/Grid2";
+
 import InfoOutlined from "@mui/icons-material/InfoOutlined";
 import { fmt } from "@/lib/number";
 
@@ -70,7 +72,7 @@ export default function LoanCalculator() {
       <CardContent>
         <Grid container spacing={3}>
           {/* Inputs */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Stack spacing={2}>
               <TextField
                 label="Loan Amount (Principal)"
@@ -130,28 +132,28 @@ export default function LoanCalculator() {
           </Grid>
 
           {/* Results */}
-          <Grid item xs={12} md={6}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <Box sx={{ mb: 1 }}>
               <Typography variant="h6">Results</Typography>
             </Box>
 
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <StatCard label="Monthly EMI" value={`₹ ${fmt(result.emi)}`} />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <StatCard
                   label="Total Interest"
                   value={`₹ ${fmt(result.totalInterest)}`}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <StatCard
                   label="Total Payment"
                   value={`₹ ${fmt(result.totalPayment)}`}
                 />
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 <StatCard label="Tenure (months)" value={`${months}`} />
               </Grid>
             </Grid>
@@ -172,7 +174,7 @@ function StatCard({ label, value }: { label: string; value: React.ReactNode }) {
           flexDirection: "column",
           justifyContent: "center",
           gap: 0.5,
-          minHeight: 92, // keeps tiles visually even
+          minHeight: 92,
         }}
       >
         <Typography variant="caption" color="text.secondary">
