@@ -1,95 +1,79 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";
 
-export default function Home() {
+import * as React from "react";
+import { Box, Toolbar, Container, Typography } from "@mui/material";
+import Sidebar, { CALC_LIST } from "@/components/Sidebar";
+import ThemeToggle from "@/components/ThemeToggle";
+
+// calculators
+import LoanCalculator from "@/components/calculators/LoanCalculator";
+import SipCalculator from "@/components/calculators/SipCalculator";
+import BrokerageCalculator from "@/components/calculators/BrokerageCalculator";
+import MarginCalculator from "@/components/calculators/MarginCalculator";
+import LumpsumCalculator from "@/components/calculators/LumpsumCalculator";
+import SwpCalculator from "@/components/calculators/SwpCalculator";
+import StepUpSipCalculator from "@/components/calculators/StepUpSipCalculator";
+import MutualFundReturnsCalculator from "@/components/calculators/MutualFundReturnsCalculator";
+import FdCalculator from "@/components/calculators/FdCalculator";
+import RdCalculator from "@/components/calculators/RdCalculator";
+import CompoundInterestCalculator from "@/components/calculators/CompoundInterestCalculator";
+import PpfCalculator from "@/components/calculators/PpfCalculator";
+
+export default function Page() {
+  const [selected, setSelected] = React.useState("EMI Calculator");
+
+  const renderCalculator = () => {
+    switch (selected) {
+      case "EMI Calculator":
+        return <LoanCalculator />;
+      case "SIP Calculator":
+        return <SipCalculator />;
+      case "Brokerage Calculator":
+        return <BrokerageCalculator />;
+      case "Margin Calculator":
+        return <MarginCalculator />;
+      case "Lumpsum Calculator":
+        return <LumpsumCalculator />;
+      case "SWP Calculator":
+        return <SwpCalculator />;
+      case "Step Up SIP Calculator":
+        return <StepUpSipCalculator />;
+      case "Mutual Fund Returns Calculator":
+        return <MutualFundReturnsCalculator />;
+      case "FD Calculator":
+        return <FdCalculator />;
+      case "RD Calculator":
+        return <RdCalculator />;
+      case "Compound Interest Calculator":
+        return <CompoundInterestCalculator />;
+      case "PPF Calculator":
+        return <PpfCalculator />;
+      default:
+        return (
+          <Typography color="text.secondary">
+            {selected} coming soon...
+          </Typography>
+        );
+    }
+  };
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.tsx</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <Box sx={{ display: "flex" }}>
+      <Sidebar selected={selected} onSelect={setSelected} />
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <Box component="main" sx={{ flexGrow: 1, p: 3 }}>
+        {/* Fixed Theme Toggle at top-right */}
+        <Box sx={{ position: "fixed", top: 16, right: 16, zIndex: 1300 }}>
+          <ThemeToggle />
+        </Box>
+        <Toolbar /> {/* Drawer offset */}
+        <Container maxWidth="md" sx={{ mt: 2 }}>
+          <Typography variant="h4" fontWeight={700} sx={{ mb: 2 }}>
+            {selected}
+          </Typography>
+          {renderCalculator()}
+        </Container>
+      </Box>
+    </Box>
   );
 }
